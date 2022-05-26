@@ -1,0 +1,54 @@
+package kr.or.ddit.basic.reqNresp;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+@WebServlet("/requestTest02.do")
+public class requestTest02 extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
+		int number1 = Integer.parseInt(request.getParameter("num1"));
+		String op = request.getParameter("op");
+		int number2 = Integer.parseInt(request.getParameter("num2"));
+		
+		double res = 0;
+		response.setCharacterEncoding("utf-8");
+		
+		//응답으로 가는 데이터는 어떤 데이터..?
+		response.setContentType("text/html; charset=utf-8");
+		//출력할 스트림 객체 구하기
+		PrintWriter out = response.getWriter();
+		
+		switch(op) {
+		case "+" : res = number1 + number2; break;
+		case "-" : res = number1 - number2; break;
+		case "*" : res = number1 * number2; break;
+		case "/" : res = number1 / number2; break;
+		case "%" : res = number1 % number2; break;
+		}
+		out.println(number1 + op + number2 + " = " + res);
+	
+	}
+		
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
