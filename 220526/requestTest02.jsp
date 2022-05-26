@@ -1,3 +1,5 @@
+//저장 위치 : webTest/ WebContent / basic / reqNresp/ requestTest02.jsp파일
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
