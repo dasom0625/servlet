@@ -1,3 +1,5 @@
+//저장된 위치 : webTest/java Resources / src /  kr.or.ddit.basic.reqNresp / requestTest02.java파일
+
 package kr.or.ddit.basic.reqNresp;
 
 import java.io.IOException;
@@ -39,7 +41,7 @@ public class requestTest02 extends HttpServlet {
 		case "*" : res = number1 * number2; break;
 		case "/" : 
 					if(number2!=0) {
-						res = number1 / number2; 
+						res = number1 / (double)number2; 
 					}else {
 						calcOk = false;
 					} break;
