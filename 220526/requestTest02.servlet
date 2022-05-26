@@ -21,9 +21,7 @@ public class requestTest02 extends HttpServlet {
 		
 		int number1 = Integer.parseInt(request.getParameter("num1"));
 		String op = request.getParameter("op");
-		int number2 = Integer.parseInt(request.getParameter("num2"));
-		
-		double res = 0;
+
 		response.setCharacterEncoding("utf-8");
 		
 		//응답으로 가는 데이터는 어떤 데이터..?
@@ -31,15 +29,34 @@ public class requestTest02 extends HttpServlet {
 		//출력할 스트림 객체 구하기
 		PrintWriter out = response.getWriter();
 		
+		int number2 = Integer.parseInt(request.getParameter("num2"));
+		
+		double res = 0;
+		boolean calcOk = true;	//계산 성공 여부가 저장될 변수(계산 성공 : true / 계산 실패 : false)
 		switch(op) {
 		case "+" : res = number1 + number2; break;
 		case "-" : res = number1 - number2; break;
 		case "*" : res = number1 * number2; break;
-		case "/" : res = number1 / number2; break;
-		case "%" : res = number1 % number2; break;
+		case "/" : 
+					if(number2!=0) {
+						res = number1 / number2; 
+					}else {
+						calcOk = false;
+					} break;
+		case "%" :
+					if(number2!=0) {
+						 res = number1 % number2; break;	
+					}else {
+						calcOk = false;
+					} break;
+		
 		}
-		out.println(number1 + op + number2 + " = " + res);
-	
+		out.println(number1 + op + number2 + " = ");
+		if(calcOk==true) {
+			out.println(res);
+		}else{
+			out.println("게산 불가");
+		}
 	}
 		
 
