@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script><!-- 여기서 slim빼기 -->
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/jquery.serializejson.min.js"></script>
+
+
+<script>
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	$(function(){
+		//이름 정규화
+		$('#name').on('keyup',function(){
+			namevalue = $(this).val().trim();
+			
+			namereg = /^[가-힣]{2,10}$/
+		
+			if(!(namereg.test(namevalue))){
+			$(this).css('border','1px solid red');
+			return false;
+			}else{
+				$(this).css('border','1px solid blue');
+			}
+		})		
+		
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//비밀번호 정규화
+		$('#pass').on('keyup',function(){
+			passvalue = $(this).val().trim();
+			
+			//8~15글자로 제한
+			passreg = /^[A-Z][$a-zA-Z0-9]{7,14}$/
+		
+			if(!(passreg.test(passvalue))){
+			$(this).css('border','1px solid red');
+			return false;
+			}else{
+				$(this).css('border','1px solid blue');
+			}
+		})		
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//이메일 정규화
+		$('#email').on('keyup',function(){
+			emailvalue = $(this).val().trim();
+			
+			//8~15글자로 제한
+			emailreg = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}*.[a-zA-Z]{0,3}$/
+		
+			if(!(emailreg.test(emailvalue))){
+			$(this).css('border','1px solid red');
+			return false;
+			}else{
+				$(this).css('border','1px solid blue');
+			}
+		})	
+		
+		
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//전화번호 정규화
+		$('#hp').on('keyup',function(){
+			hpvalue = $(this).val().trim();
+			
+			//8~15글자로 제한
+			hpreg = /^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$/
+		
+			if(!(hpreg.test(hpvalue))){
+			$(this).css('border','1px solid red');
+			return false;
+			}else{
+				$(this).css('border','1px solid blue');
+			}
+		})	
+		
+		
+		
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//아이디 중복검사
+		$('#checkid').on('click',function(){
+			//1.입력한 아이디 가져오기 => 요청과 응답
+			//1-3.공백체크
+			idvalue = $('#id').val().trim();
+			
+			//공백체크
+			if(idvalue.length < 1){
+				alert("아이디를 입력하세요.");
+				
+				return false;	//아이디를 입력하세요 알럿 띄운 뒤 다시 입력하게하기.
+			}
+			//아이디 길이 체크(4~12)
+			if(idvalue.length < 4 || idvalue.length >13){
+				alert("아이디는 4~12 사이로 설정해주세요.");
+				return false;
+			}
+			
+			//아이디 길이 체크 정규식=>정규식은 //사이에 들어간다. 시작할때 ^로 시작
+			idreg = /^[a-z][$a-zA-Z0-9]{3,11}$/
+			
+			//정규화 값 체크 =>정규식.test(value);	=> true또는false를 return한다.
+			if(!(idreg.test(idvalue))){
+				alert("아이디 형식 오류입니다. 다시 확인해주세요.");
+				return false;
+			}
+
+			//요청,응답
+			$.ajax({
+				//1-1. 요청
+				url	 : '/jqpro/IdCheck.do',	//IdCheck.java에 있는 16번째줄 @WebServlet("/IdCheck.do")의 이름이다. => 요청하면 servlet으로 넘어감.(/를 반드시 써야함.=>쓰지않으면 404오류 발생)
+				type : 'post',
+				data : "id="+$('#id').val().trim(),	//#id에서 값을 가져와라.라는 의미(공백금지)
+// 				data : {"id" : $('#id').val().trim()};//이렇게 {"key" : value}방식으로 써도된다. 
+				
+				//1-2. 응답
+				success : function(res){
+					$('#spanid').html(res.sw).css('color','red');
+				},
+				error : function(xhr){
+					alert("상태 : "+ xhr.status)	//status => 200(json형식확인) / 404(19번째가 틀렸거나, jsp가 잘못됐거나)
+				},
+				dataType : 'json'
+
+			})
+		
+		})
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		//우편번호 검색=>새로운 창 열게하기
+		$('#zipbtn').on('click',function(){
+			//1. 새로운 창 열기
+			window.open("searchDong.html","우편번호찾기","width=500 heigh=400");//우편번호찾기는 serachDong.html의 논리적인 이름(화면에 보이지 않는 이름이라 논리적.)이고, 이 대신 _blank나 _self를 넣을 수 있다.
+		})
+		
+		//최종 전송제출 => 저장하기
+		$('form').on('submit',function(){
+// 			alert('전송한다.');
+
+			//입력한 모든 값을 가져온다.=>간단한 방법 
+			userData1 = $('form').serialize();
+			userData2 = $('form').serializeArray();
+			userData3 = $('form').serializeJSON();
+			console.log(userData1);
+			console.log(userData2);
+			console.log(userData3);
+			
+			//서버로 전송한다 =>controller로가 이걸 받아서 service, dao거쳐서 db수행하고 다시 controller로 돌아와 view페이지(jsp)에서 출력하는데 그게 여기 ajax의 success로 돌아옴.
+			
+			$.ajax({
+				url : '/jqpro/InsertMember.do',
+				type : 'post',//데이터가 많으니까  post로 가세요
+				data : userData3,
+				success : function(res){
+					$('#joinspan').html(res.sw).css('color','pink');
+
+
+				},
+				error : function(xhr){
+					alert("상태 : "+xhr.status);
+				},
+				dataType : 'json'
+			})
+		})
+		
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+		$('sidobtn').on('click',function(){
+			//요청과 응답
+			dvalue = $('sido').val().trim;
+			
+			//위의것으로 서버 요청하기
+			$.ajax({
+				//요청 부분
+				url : 'jqpro.searchZip.do',
+				type : 'get',
+				data : {'sido':dvalue},
+				
+				//응답부분
+				dataType : "json",
+				success : function(res){
+					code = "<table border = '1'>";
+					code += "<thead><tr><td>우편번호"<
+				}
+			
+			}) 
+		})
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+		
+		//우편번호 모달창에서 동 입력 후 확인버튼 클릭시...
+		$('#dongbtn').on('click',function(){
+			
+			//요청과 응답
+			dvalue = $('#dong').val().trim();
+			
+			//위의 것으로 서버로 요청하기
+			$.ajax({
+				//요청부분
+				url : '/jqpro/searchZip.do',
+				type : 'get',
+				data : {"dong" : dvalue},
+				
+				//응답부분
+				dataType : 'json',
+				error : function(xhr){
+					alert("상태 : "+xhr.status)
+				},
+				success : function(res){
+					code = "<table border = '1' >";
+					code += "<thead><tr><td>우편번호</td>";
+					code += "<td>주소</td>";
+					code += "<td>번지</td></tr></thead>";
+					
+					$.each(res,function(i,v){
+						
+					code += "<tr class = 'tdata'><td>"+v.zipcode+"</td>";
+					code += "<td>"+v.addr+"</td>";
+					code += "<td>"+v.bunji+"</td></tr>";
+					})
+					code += "</table>";
+					
+					$('#d1').html(code);
+				}
+				
+			})
+			
+		})//onClick끝.
+		
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+		
+		//우편번호 모달창에서 한개의 행을 선택하면?
+		
+		$('#d1').on('click','.tdata',function(){
+			zip = $('td:eq(0)', this).text();
+			addr = $('td:eq(1)', this).text();
+			
+			//부모창으로 보낸다.
+			$('#zip').val(zip);	
+			$('#add1').val(addr);
+
+			//모달 창 닫기
+			$('#myModal').modal('hide');//보여줄때는 hide대신 show
+			$('#dong').val("");	//검색했던 동 의 내용 지우고
+			$('#d1').empty();	//검색했던것 초기화
+		})
+		
+	})
+
+</script>
+<style>
+.tdata:hover{ /*동적인 css*/
+background: yellow;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Stacked form</h2>
+  <form onsubmit = "return false;">
+  	<div class="form-group">
+      <label for="id">ID:  </label>
+	
+      <input type="text" class="form-control" id="id" placeholder="Enter id" name="mem_id"><br>
+      <input type = "button" class="btn btn-outline-primary btn-sm" id = "checkid" value = "중복검사">
+      <span id = "spanid"></span><!-- id중복검사의 결과를 spanid에 찍을 것이다.  -->
+    </div>
+
+
+  	<div class="form-group">
+      <label for="name">NAME</label>
+      <input type="text" class="form-control" id="name" placeholder="2~10자의 이름을 입력해주세요." name="mem_name">
+    </div>
+  
+  
+    <div class="form-group">
+      <label for="pass">PASSWORD</label>
+      <input type="text" class="form-control" id="pass" placeholder="8~15자의 비밀번호를 입력해주세요. 단,첫 글자는 영문자 대문자입니다." name="mem_pass">
+    </div>
+    
+
+    <div class="form-group">
+      <label for="hp">HP</label>
+      <input type="text" class="form-control" id="hp" placeholder="000-0000-0000 형식에 맞춰 입력해주세요." name="mem_hp">
+    </div>
+
+
+    <div class="form-group">
+      <label for="email">EMAIL</label>
+      <input type="text" class="form-control" id="email" placeholder="user@email.com 형식에 맞춰 입력해주세요." name="mem_mail">
+    </div>
+
+
+    <div class="form-group">
+      <label for="bir">BIRTHDAY:</label>
+      <input type="date" class="form-control" id="bir" placeholder="Enter birthday" name="mem_bir">
+    </div>
+
+
+<!--     <div class="form-group"> -->
+<!--       <label for="zip">ZIP:</label> -->
+<!--       <input type="text" class="form-control" id="zip" placeholder="Enter zip" name="mem_zip"><br> -->
+<!-- <!--       <input type="text" class="form-control" id="zip" placeholder="Enter zip" value = "번호검색 modal" data-toggle="modal" data-target="#myModal"><br> --> -->
+<!--       <input type = "button" class="btn btn-outline-primary btn-sm" value = "번호검색" id = "zipbtn"> -->
+<!--       <input type = "button" class="btn btn-outline-primary btn-sm" value = "번호검색modal" id = "zipbtn" data-toggle="modal" data-target="#myModal"> -->
+<!--     </div> -->
+
+    <div class="form-group">
+      <label for="zip">ZIP:</label>
+      <input type="text" class="form-control" id="zip" placeholder="Enter zip" name="mem_zip"><br>
+          <select class="form-control" id="prod" name="sellist2">
+      <select type = "button" class="btn btn-outline-primary btn-sm" value = "번호검색modal" id = "zipbtn" data-toggle="modal" data-target="#myModal">
+    </div>
+
+
+    <div class="form-group">
+     <label for="add1">주소:</label>
+      <input type="text" class="form-control" id="add1" placeholder="Enter add1" name="mem_add1">
+    </div>
+
+    <div class="form-group">
+     <label for="add2">상세 주소:</label>
+      <input type="text" class="form-control" id="add2" placeholder="Enter add2" name="mem_add2">
+    </div>
+   
+   
+    <div class="form-group form-check">
+      <label class="form-check-label">
+        <input class="form-check-input" type="checkbox" name="remember"> Remember me
+      </label>
+    </div>
+   
+   
+    <button type="submit" class="btn btn-primary btn-block">Submit</button>
+    <span id = "joinspan"></span>
+  </form>
+</div>
+
+
+<!-- The Modal -->
+  <div class="modal" id="myModal">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+      
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">동을 입력하세요.</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="modal-body">
+        
+        
+        
+  <!--  5.29 과제 -->        
+<!--           <h3>주소를 클릭하세요.</h3> -->
+<!-- 			<br><br> -->
+<!-- 			<input type = "text" id = "dong"> -->
+<!-- 			<input type="button" value="확인" id="dongbtn"> -->
+<!-- 			<br><br> -->
+<!-- 			<div id = "d1"></div>    -->
+          <h3>주소를 클릭하세요.</h3>
+			<input type = "text" id = "siido">
+			<input type="button" value="확인" id="Sidobtn">
+			<br><br>
+			<input type = "text" id = "gungu">
+			<input type="button" value="확인" id="gungubtn">
+			<br><br>
+			<input type = "text" id = "dong">
+			<input type="button" value="확인" id="dongbtn">
+			<br><br>
+			<div id = "d1"></div>   
+
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  
+</body>
+</html>
