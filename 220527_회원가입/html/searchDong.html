@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="EUC-KR">
+<title>Insert title here</title>
+<link rel = "stylesheet" href = "../css/public.css">
+<link href="https://fonts.googleapis.com/css2?family=Dongle&display=swap" rel="stylesheet">
+<script src = "../js/jquery-3.6.0.min.js"></script>
+<style>
+table{
+text-align: center;
+border : 2px solid orange;
+padding : 5px;
+}
+
+thead{
+background: orange;
+font-weight: bold;
+font-size: 1.5em;
+color : white;
+}
+td{
+padding : 10px;
+}
+.bcolor:hover{ /*동적인 css*/
+background: yellow;
+}
+</style>
+<script>
+$(function(){
+	$('input:button').on('click',function(){
+		//입력한 값 가져오기(input type="text" id = "dong"에서 입력한거)
+		dvalue = $('#dong').val().trim();
+		
+		
+		//위의 것으로 서버로 요청하기
+		$.ajax({
+			//요청부분
+			url : '/jqpro/searchZip.do',
+			type : 'get',
+			data : {"dong" : dvalue},
+			
+			//응답부분
+			dataType : 'json',
+			error : function(xhr){
+				alert("상태 : "+xhr.status)
+			},
+			success : function(res){
+				code = "<table border = '1' >";
+				code += "<thead><tr><td>우편번호</td>";
+				code += "<td>주소</td>";
+				code += "<td>번지</td></tr></thead>";
+				
+				$.each(res,function(i,v){
+					
+				code += "<tr class = 'tdata'><td>"+v.zipcode+"</td>";
+				code += "<td>"+v.addr+"</td>";
+				code += "<td>"+v.bunji+"</td></tr>";
+				})
+				code += "</table>";
+				
+				$('#d1').html(code);
+			}
+			
+		})
+	})
+
+	$('#d1').on('click','.tdata',function(){
+		zip = $('td:eq(0)', this).text();
+		addr = $('td:eq(1)', this).text();
+		
+		//부모창으로 보낸다.
+		$('#zip',opener.document).val(zip);	//$('#아이디',opener.document).val(위의 변수이름);
+		$('#add1',opener.document).val(addr);
+		
+		window.close();
+	})
+	
+})
+</script>
+
+</head>
+<body>
+
+
+<pre></pre>
+<h3>동 이름을 입력하세요.</h3>
+<input type = "text" id = "dong">
+<input type="button" value="확인">
+<br><br>
+<div id = "d1"></div>
+</body>
+</html>
